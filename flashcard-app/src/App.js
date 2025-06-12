@@ -57,6 +57,7 @@ function App() {
           navigate(1);
           break;
         case " ": // Spacebar to flip
+          e.preventDefault(); // Prevent spacebar from clicking focused buttons
           setIsFlipped(!isFlipped);
           break;
         default:
@@ -171,6 +172,17 @@ function App() {
     setIsFlipped(false);
   };
 
+  // Shuffle cards using Fisher-Yates algorithm
+  const shuffleCards = () => {
+    const shuffledCards = [...cards];
+    for (let i = shuffledCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]];
+    }
+    setCards(shuffledCards);
+    setCurrentIndex(0);
+  };
+
   // Clear all cards and reset to defaults
   const resetCards = () => {
     if (
@@ -206,17 +218,16 @@ function App() {
       {cards.length > 0 && !isEditing && !showExportModal && (
         <div className="mb-4 w-full max-w-md">
           <div
-            className="bg-white rounded-lg shadow-lg p-6 min-h-64 flex items-center justify-center cursor-pointer transition-all duration-300 transform relative"
-            onClick={() => setIsFlipped(!isFlipped)}
+            className="bg-white rounded-lg shadow-lg p-6 min-h-64 flex items-center justify-center transition-all duration-300 transform relative"
             style={{ perspective: "1000px" }}
           >
             <div
-              className={`w-full h-full flex items-center justify-center text-xl transition-transform duration-500 ${isFlipped ? "rotate-y-180" : ""}`}
+              className={`w-full h-full flex items-center justify-center text-xl transition-transform duration-500`}
             >
               {isFlipped ? (
-                <p className="text-center">{cards[currentIndex].back}</p>
+                <p className="text-center text-4xl">{cards[currentIndex].back}</p>
               ) : (
-                <p className="text-center font-semibold">
+                <p className="text-center font-semibold text-4xl">
                   {cards[currentIndex].front}
                 </p>
               )}
@@ -268,13 +279,19 @@ function App() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mb-2"
+              onClick={shuffleCards}
+            >
+              Shuffle Cards
+            </button>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2"
               onClick={exportCards}
             >
               Export Cards
             </button>
 
-            <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer">
+            <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer mb-2">
               Import Cards
               <input
                 type="file"
